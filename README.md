@@ -18,6 +18,7 @@ Bọn em quyết định lựa chọn đề tài web game cờ vua vì đây là
 | **Đấu với máy** | 1 Người chơi | Chơi đơn với máy. Tích hợp engine chuyên nghiệp **Stockfish** hỗ trợ tùy chỉnh nhiều cấp độ khó khác nhau (từ dễ đến khó) để luyện tập chiến thuật. |
 | **Kiểm soát luật chơi** | Hệ thống hệ thống | Tự động nhận diện nước đi hợp lệ, bắt tốt qua đường, nhập thành, chiếu tướng, chiếu bí và xử hòa nhờ `Chess.js`. |
 | **Giao diện tương tác** | Giao diện | Bàn cờ hiển thị trực quan, hỗ trợ thao tác kéo-thả quân cờ mượt mà nhờ `Chessboard.js`. |
+| Đa ngôn ngữ | Giao diện | Hỗ trợ chuyển đổi ngôn ngữ linh hoạt (ví dụ: Tiếng Việt / Tiếng Anh) giúp tối ưu trải nghiệm người dùng. |
 
 ---
 
@@ -30,6 +31,6 @@ Bọn em quyết định lựa chọn đề tài web game cờ vua vì đây là
 ---
 
 ## 👥 Thành viên thực hiện
-* **Thành viên 1:** [Họ và tên] - MSSV: [Mã số sinh viên] (Trưởng nhóm)
-* **Thành viên 2:** [Họ và tên] - MSSV: [Mã số sinh viên]
-* **Thành viên 3:** [Họ và tên] - MSSV: [Mã số sinh viên]
+* **Thành viên 1:** [Nguyễn Minh Đạo] - MSSV: [24100222] (Trưởng nhóm)
+* **Thành viên 2:** [Đặng Văn Nam Khán]  - MSSV: [24100041]
+* **Thành viên 3:** [Nguyễn Thanh Hải] - MSSV: [21011491]
