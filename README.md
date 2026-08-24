@@ -19,7 +19,7 @@ Bọn em quyết định lựa chọn đề tài web game cờ vua vì đây là
 | **Kiểm soát luật chơi** | Hệ thống hệ thống | Tự động nhận diện nước đi hợp lệ, bắt tốt qua đường, nhập thành, chiếu tướng, chiếu bí và xử hòa nhờ `Chess.js`. |
 | **Giao diện tương tác** | Giao diện | Bàn cờ hiển thị trực quan, hỗ trợ thao tác kéo-thả quân cờ mượt mà nhờ `Chessboard.js`. |
 | Đa ngôn ngữ | Giao diện | Hỗ trợ chuyển đổi ngôn ngữ linh hoạt (ví dụ: Tiếng Việt / Tiếng Anh) giúp tối ưu trải nghiệm người dùng. |
-
+| **Đa nền tảng** | Mobile / PC | Website được tối ưu để hoạt động trên nhiều thiết bị như **điện thoại, máy tính bảng và máy tính**, giao diện tự động thích ứng với kích thước màn hình và hỗ trợ thao tác **chạm trên mobile** cũng như **chuột/kéo-thả trên PC**. |
 ---
 
 ## 🛠️ Công nghệ sử dụng
