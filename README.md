@@ -1,36 +1,71 @@
-# ♟️ Web Game Cờ Vua - Dự Án Nhóm 10
+# 📱 Better Phenikaa - Dự Án Nhóm 10
 
 ## 📝 Tổng quan đề tài
 
-### Lý do lựa chọn
-Bọn em quyết định lựa chọn đề tài web game cờ vua vì đây là một sản phẩm độc đáo, giúp **tránh được các yếu tố ngẫu nhiên** để tập trung hoàn toàn vào tư duy logic thuần túy. Dự án còn giúp rèn luyện kỹ năng quản lý trạng thái (*state management*) phức tạp, tạo ra một sản phẩm trực quan, thực chiến và nổi bật hơn hẳn các bài tập quản lý thông thường.
+**Better Phenikaa** là ứng dụng hỗ trợ sinh viên Phenikaa theo dõi lịch học, lịch thi và các thông tin học tập cần thiết một cách nhanh chóng, trực quan và thuận tiện hơn trên thiết bị Android.
 
-### Hạn chế của đề tài
-* **Chưa hỗ trợ kết nối mạng:** Trò chơi chỉ chạy trực tiếp trên một máy (Local), chưa thể kết nối hai người chơi ở hai thiết bị khác nhau qua Internet.
+Ứng dụng được xây dựng theo hướng đơn giản hóa quá trình truy cập thông tin từ hệ thống QLĐT, đồng thời đưa các thông tin quan trọng như lịch học ra ngay màn hình chính thông qua widget.
 
 ---
 
-## 🚀 Bảng tính năng hệ thống
+## 💡 Lý do lựa chọn đề tài
 
-| Tên tính năng | Chế độ chơi | Mô tả chi tiết |
-| :--- | :--- | :--- |
-| **Đấu nội bộ** | 2 Người chơi | Hai người ngồi chung một máy, thay phiên nhau đi quân trực tiếp trên cùng một màn hình. |
-| **Đấu với máy** | 1 Người chơi | Chơi đơn với máy. Tích hợp engine chuyên nghiệp **Stockfish** hỗ trợ tùy chỉnh nhiều cấp độ khó khác nhau (từ dễ đến khó) để luyện tập chiến thuật. |
-| **Kiểm soát luật chơi** | Hệ thống hệ thống | Tự động nhận diện nước đi hợp lệ, bắt tốt qua đường, nhập thành, chiếu tướng, chiếu bí và xử hòa nhờ `Chess.js`. |
-| **Giao diện tương tác** | Giao diện | Bàn cờ hiển thị trực quan, hỗ trợ thao tác kéo-thả quân cờ mượt mà nhờ `Chessboard.js`. |
-| Đa ngôn ngữ | Giao diện | Hỗ trợ chuyển đổi ngôn ngữ linh hoạt (ví dụ: Tiếng Việt / Tiếng Anh) giúp tối ưu trải nghiệm người dùng. |
-| **Đa nền tảng** | Mobile / PC | Website được tối ưu để hoạt động trên nhiều thiết bị như **điện thoại, máy tính bảng và máy tính**, giao diện tự động thích ứng với kích thước màn hình và hỗ trợ thao tác **chạm trên mobile** cũng như **chuột/kéo-thả trên PC**. |
+Nhóm lựa chọn phát triển Better Phenikaa với mong muốn **thử sức với một dự án ứng dụng di động có tính thực tế cao**, thay vì chỉ dừng lại ở các bài tập mô phỏng.
+
+Bên cạnh mục tiêu học tập, đề tài còn hướng tới việc giúp đời sống sinh viên thuận tiện hơn trong quá trình sử dụng hệ thống học tập hằng ngày. Sinh viên có thể đăng nhập, theo dõi lịch học, lịch thi và xem nhanh thông tin cần thiết mà không phải thực hiện lại nhiều thao tác thủ công.
+
+Thông qua dự án, nhóm có cơ hội thực hành nhiều nội dung quan trọng như xây dựng giao diện ứng dụng, xử lý dữ liệu, tích hợp WebView, duy trì trạng thái ứng dụng, làm việc với Android Widget và tổ chức một ứng dụng Flutter hoàn chỉnh.
+
+---
+
+## 🚀 Chức năng chính
+
+| Chức năng | Mô tả |
+| :--- | :--- |
+| **Đăng nhập QLĐT** | Hỗ trợ sinh viên truy cập hệ thống QLĐT trực tiếp từ ứng dụng. |
+| **Lấy dữ liệu học tập** | Tiếp nhận và xử lý các thông tin cần thiết từ phiên đăng nhập QLĐT. |
+| **Lịch học** | Hiển thị lịch học theo giao diện trực quan, dễ theo dõi trên điện thoại. |
+| **Lịch thi** | Hiển thị thông tin lịch thi phục vụ quá trình học tập. |
+| **Đồng bộ dữ liệu** | Cập nhật dữ liệu để ứng dụng và widget sử dụng thông tin mới nhất đã lấy được. |
+| **Widget Android** | Hiển thị nhanh lịch học và thông tin cần thiết ngay trên màn hình chính mà không cần mở ứng dụng. |
+| **Giao diện ứng dụng** | Thiết kế giao diện thống nhất, tối ưu cho quá trình sử dụng hằng ngày của sinh viên. |
+| **Lưu trạng thái cục bộ** | Lưu các thiết lập và dữ liệu cần thiết trên thiết bị để cải thiện trải nghiệm sử dụng. |
+
+---
+
+## ⚠️ Hạn chế
+
+* Ứng dụng hiện **chỉ hỗ trợ Android**, chưa có phiên bản chính thức cho iOS.
+* Do sự khác biệt giữa các phiên bản Android, launcher, nhà sản xuất thiết bị và cơ chế quản lý widget, ứng dụng **vẫn có thể phát sinh lỗi trên một số thiết bị chưa tương thích hoàn toàn**.
+* Một số chức năng phụ thuộc vào cấu trúc và khả năng truy cập của hệ thống QLĐT, vì vậy có thể cần điều chỉnh nếu hệ thống phía QLĐT thay đổi.
+
 ---
 
 ## 🛠️ Công nghệ sử dụng
-* **Frontend:** HTML5, CSS3, JavaScript (jQuery)
-* **Thư viện Logic:** [Chess.js](https://github.com)
-* **Thư viện Bàn cờ:** [Chessboard.js](https://chessboardjs.com)
-* **Chess Engine (AI):** [Stockfish.js](https://github.com) (Phiên bản chạy trực tiếp trên trình duyệt thông qua Web Worker)
+
+* **Ngôn ngữ lập trình:** Dart
+* **Framework:** Flutter
+* **Nền tảng triển khai:** Android
+* **WebView / kết nối QLĐT:** `flutter_inappwebview`
+* **Android Home Screen Widget:** `home_widget`
+* **Xử lý nội dung HTML:** `html`
+* **Lưu trữ cục bộ và thiết lập ứng dụng:** `shared_preferences`
+* **UI:** Flutter Material Design
+* **Kiểm thử:** Flutter Test
+* **Phân tích chất lượng mã nguồn:** `very_good_analysis`
 
 ---
 
-## 👥 Thành viên thực hiện
-* **Thành viên 1:** [Nguyễn Minh Đạo] - MSSV: [24100222] (Trưởng nhóm)
-* **Thành viên 2:** [Đặng Văn Nam Khán]  - MSSV: [24100041]
-* **Thành viên 3:** [Nguyễn Thanh Hải] - MSSV: [21011491]
+## 👥 Phân công thành viên
+
+| Thành viên | MSSV | Phân công |
+| :--- | :--- | :--- |
+| **Nguyễn Minh Đạo** *(Trưởng nhóm)* | **24100222** | Phụ trách logic vận hành tổng thể của ứng dụng, đồng bộ dữ liệu, tích hợp và vận hành **Android Widget**. |
+| **Đặng Văn Nam Khán** | **24100041** | Phụ trách **trang đăng nhập**, kết nối và xử lý luồng truy cập **QLĐT**, phục vụ việc lấy dữ liệu cho ứng dụng. |
+| **Nguyễn Thanh Hải** | **21011491** | Phụ trách thiết kế và hoàn thiện **toàn bộ giao diện UI** của ứng dụng, bảo đảm tính thống nhất và thuận tiện khi sử dụng. |
+
+---
+
+## 🎯 Mục tiêu của dự án
+
+Dự án hướng tới việc tạo ra một ứng dụng hỗ trợ sinh viên có thể sử dụng trong thực tế, đồng thời giúp các thành viên trong nhóm rèn luyện kỹ năng phát triển ứng dụng bằng Flutter, phối hợp nhiều thành phần của hệ thống và giải quyết các vấn đề phát sinh trên thiết bị Android thực tế.
