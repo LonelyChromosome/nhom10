@@ -33,6 +33,20 @@ Thông qua dự án, nhóm có cơ hội thực hành nhiều nội dung quan tr
 
 ---
 
+## 🔐 Bảo mật & quyền riêng tư dữ liệu
+
+Better Phenikaa được xây dựng theo nguyên tắc **tôn trọng tuyệt đối quyền riêng tư của người dùng**.
+
+* Ứng dụng **không thu thập thông tin cá nhân của người dùng để gửi về máy chủ riêng của nhóm phát triển**.
+* Ứng dụng **không bán, chia sẻ hoặc chuyển dữ liệu người dùng cho bất kỳ bên thứ ba nào**.
+* Thông tin đăng nhập và dữ liệu lấy từ QLĐT chỉ được sử dụng để phục vụ các chức năng cần thiết của ứng dụng như hiển thị lịch học, lịch thi, đồng bộ dữ liệu và widget.
+* Các dữ liệu cần lưu được xử lý **cục bộ trên thiết bị của người dùng** trong phạm vi cần thiết cho hoạt động của ứng dụng.
+* Nhóm phát triển **không xây dựng hệ thống theo dõi, quảng cáo, phân tích hành vi hoặc thu thập dữ liệu người dùng**.
+
+Mục tiêu của ứng dụng là giúp sinh viên sử dụng thông tin học tập thuận tiện hơn mà **không biến dữ liệu cá nhân thành dữ liệu thu thập cho một dịch vụ bên thứ ba**.
+
+---
+
 ## ⚠️ Hạn chế
 
 * Ứng dụng hiện **chỉ hỗ trợ Android**, chưa có phiên bản chính thức cho iOS.
