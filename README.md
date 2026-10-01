@@ -18,9 +18,9 @@ Dự án tập trung vào ba mục tiêu chính:
 
 ---
 
-## 🧭 Ý định phát triển
+## 🎓 Vai trò trong Bài tập lớn Kỹ thuật phần mềm
 
-Nhóm định hướng Better Phenikaa theo tiêu chí **ít thao tác hơn, dữ liệu dễ tiếp cận hơn và ưu tiên trải nghiệm sử dụng thực tế**. Ứng dụng không nhằm thay thế hệ thống QLĐT mà đóng vai trò như một lớp hỗ trợ phía người dùng: tổ chức lại thông tin học tập, lưu dữ liệu cần thiết trên thiết bị và đưa các nội dung quan trọng như lịch học, lịch thi, trạng thái đồng bộ và nhắc việc đến vị trí thuận tiện hơn để sử dụng hằng ngày.
+Better Phenikaa được sử dụng làm **Bài tập lớn môn Kỹ thuật phần mềm**, với mục tiêu vận dụng các nội dung đã học vào một sản phẩm có quy mô và luồng xử lý thực tế. Dự án thể hiện quá trình từ xác định yêu cầu, phân chia chức năng, thiết kế cấu trúc dữ liệu và kiến trúc phần mềm, triển khai các module, tích hợp hệ thống bên ngoài, quản lý mã nguồn, kiểm thử và hoàn thiện sản phẩm theo nhóm.
 
 ---
 
