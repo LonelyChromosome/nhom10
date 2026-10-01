@@ -18,6 +18,12 @@ Dự án tập trung vào ba mục tiêu chính:
 
 ---
 
+## 🧭 Ý định phát triển
+
+Nhóm định hướng Better Phenikaa theo tiêu chí **ít thao tác hơn, dữ liệu dễ tiếp cận hơn và ưu tiên trải nghiệm sử dụng thực tế**. Ứng dụng không nhằm thay thế hệ thống QLĐT mà đóng vai trò như một lớp hỗ trợ phía người dùng: tổ chức lại thông tin học tập, lưu dữ liệu cần thiết trên thiết bị và đưa các nội dung quan trọng như lịch học, lịch thi, trạng thái đồng bộ và nhắc việc đến vị trí thuận tiện hơn để sử dụng hằng ngày.
+
+---
+
 ## 💡 Lý do lựa chọn đề tài
 
 Trong quá trình sử dụng hệ thống QLĐT, sinh viên thường phải đăng nhập và thực hiện nhiều bước chỉ để kiểm tra những thông tin lặp lại hằng ngày như hôm nay học môn gì, học ở đâu hoặc sắp có lịch thi nào.
