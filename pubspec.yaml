@@ -12,6 +12,7 @@ dependencies:
   home_widget: 0.9.4
   html: 0.15.7
   shared_preferences: 2.5.5
+  cryptography: 2.9.0
 
 dev_dependencies:
   flutter_test:
@@ -22,15 +23,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  assets:
-    - assets/tien_mon_premium/app_backgrounds/
-    - assets/tien_mon_premium/widget_overview/
-
-  fonts:
-    - family: MinecraftCustom
-      fonts:
-        - asset: assets/fonts/minecraft.ttf
-    - family: FzCoTrang
-      fonts:
-        - asset: assets/tien_mon_premium/fonts/FzCoTrang.ttf
