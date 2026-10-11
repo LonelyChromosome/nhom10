@@ -6,14 +6,11 @@ import 'package:better_phenikaa_schedule/features/giao_dien/bo_may/theme_generat
 import 'package:better_phenikaa_schedule/features/giao_dien/bo_may/theme_source.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/bo_may/theme_tokens.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/du_lieu/custom_theme.dart';
-import 'package:better_phenikaa_schedule/features/giao_dien/du_lieu/widget_theme_configuration.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/phoi_mau/color_mixer.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/phong_chu/font_choice.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/phong_chu/font_manager.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/tep_cuc_bo/file_bytes.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/tep_cuc_bo/local_file_bridge.dart';
-import 'package:better_phenikaa_schedule/features/giao_dien/xem_truoc/native_widget_preview.dart';
-import 'package:better_phenikaa_schedule/features/giao_dien/xem_truoc/widget_image_crop_editor.dart';
 import 'package:better_phenikaa_schedule/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -53,22 +50,12 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
   bool _useThirdColor = true;
   bool _busy = false;
   String? _error;
-  WidgetThemeConfiguration _widgetConfiguration =
-      const WidgetThemeConfiguration();
-  WidgetSurfaceKind _previewSurface = WidgetSurfaceKind.widget2;
-  final Map<WidgetSurfaceKind, Uint8List> _nativePreviews =
-      <WidgetSurfaceKind, Uint8List>{};
-  Timer? _previewDebounce;
-  int _previewSerial = 0;
 
   @override
   void initState() {
     super.initState();
     final existing = widget.existing;
     if (existing == null) {
-      // A brand-new custom theme never clones the settings of a preset or another custom.
-      _widgetConfiguration = const WidgetThemeConfiguration()
-          .copyWith(cornerRadius: _radius);
       _nameController.text = 'Theme của tôi';
       _regenerate();
       return;
@@ -93,11 +80,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
         .map((color) => ExtractedSwatch(color, 1))
         .toList();
     _font = existing.font;
-    _widgetConfiguration = existing.widgets.copyWith(
-      cornerRadius: existing.hasWidgetConfiguration
-          ? existing.widgets.cornerRadius
-          : existing.tokens.radius,
-    );
     _tokens = existing.tokens;
     _preferDark = existing.tokens.dark;
     _radius = existing.tokens.radius;
@@ -106,7 +88,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
 
   @override
   void dispose() {
-    _previewDebounce?.cancel();
     _nameController.dispose();
     super.dispose();
   }
@@ -133,7 +114,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
         _error = 'Font đã lưu không còn đọc được; đang dùng font mặc định.';
       }
     });
-    _scheduleNativePreviews();
   }
 
   Future<void> _pickImage() async {
@@ -156,7 +136,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
         _imageName = file.name;
         _imageSwatches = swatches;
       });
-      _scheduleNativePreviews();
       _regenerate();
     } on Object catch (error) {
       if (mounted) setState(() => _error = 'Không đọc được ảnh: $error');
@@ -177,7 +156,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
         _font = imported;
         _previewFontFamily = imported.family;
       });
-      _scheduleNativePreviews();
     } on Object catch (error) {
       if (mounted) setState(() => _error = 'Font không hợp lệ: $error');
     } finally {
@@ -209,181 +187,9 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
         _tokens = tokens;
         _error = null;
       });
-      _scheduleNativePreviews();
     } on Object catch (error) {
       setState(() => _error = 'Không thể sinh theme: $error');
     }
-  }
-
-  void _scheduleNativePreviews() {
-    ++_previewSerial;
-    // Throttle to one native frame per 32 ms. Unlike a trailing debounce this
-    // continues updating while a slider is still moving.
-    if (_previewDebounce?.isActive ?? false) return;
-    _previewDebounce = Timer(const Duration(milliseconds: 32), () async {
-      final serial = _previewSerial;
-      final tokens = _tokens;
-      if (tokens == null) return;
-      final surface = _previewSurface;
-      final renderer = const NativeWidgetPreview();
-      final bytes = await renderer.render(
-        surface: surface,
-        tokens: tokens,
-        configuration: _widgetConfiguration,
-        fontFamily: _font.family ?? '',
-        fontPath: _font.path ?? '',
-      );
-      if (!mounted || serial != _previewSerial) return;
-      if (bytes != null) setState(() => _nativePreviews[surface] = bytes);
-    });
-  }
-
-  Future<void> _pickWidgetImage(WidgetSurfaceKind surface) async {
-    if (surface == WidgetSurfaceKind.small) return;
-    setState(() {
-      _busy = true;
-      _error = null;
-    });
-    try {
-      final file = await LocalFileBridge.pick(LocalFileKind.image);
-      if (file == null || !mounted) return;
-      // Validate the managed full-resolution copy. Native renderers decode a
-      // bounded sample and cache the launcher-sized result.
-      final bytes = await readManagedFile(
-        file.path,
-        maximumBytes: _maximumImageBytes,
-      );
-      // Preserve both choices: full uncropped image or a manually selected
-      // region. The system photo picker itself stays unchanged.
-      final selectRegion = await showModalBottomSheet<bool>(
-        context: context,
-        builder: (sheetContext) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                title: const Text('Dùng toàn ảnh'),
-                onTap: () => Navigator.pop(sheetContext, false),
-              ),
-              ListTile(
-                title: const Text('Chọn vùng ảnh'),
-                onTap: () => Navigator.pop(sheetContext, true),
-              ),
-            ],
-          ),
-        ),
-      );
-      if (selectRegion == null || !mounted) return;
-      final crop = selectRegion
-          ? await Navigator.of(context).push<WidgetImageCrop>(
-              MaterialPageRoute<WidgetImageCrop>(
-                builder: (_) => WidgetImageCropEditor(
-                  bytes: bytes,
-                  aspectRatio: surface == WidgetSurfaceKind.large ? 2.15 : .68,
-                ),
-              ),
-            )
-          : const WidgetImageCrop();
-      if (crop == null || !mounted) return;
-      setState(() {
-        _widgetConfiguration = surface == WidgetSurfaceKind.large
-            ? _widgetConfiguration.copyWith(
-                largeImagePath: file.path,
-                largeImageCrop: crop,
-              )
-            : _widgetConfiguration.copyWith(
-                widget2ImagePath: file.path,
-                widget2ImageCrop: crop,
-              );
-      });
-      _scheduleNativePreviews();
-    } on Object catch (error) {
-      if (mounted) setState(() => _error = 'Không đọc được ảnh widget: $error');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  void _clearWidgetImage(WidgetSurfaceKind surface) {
-    setState(() {
-      _widgetConfiguration = surface == WidgetSurfaceKind.large
-          ? _widgetConfiguration.copyWith(
-              largeImagePath: '',
-              largeImageCrop: const WidgetImageCrop(),
-            )
-          : _widgetConfiguration.copyWith(
-              widget2ImagePath: '',
-              widget2ImageCrop: const WidgetImageCrop(),
-            );
-    });
-    _scheduleNativePreviews();
-  }
-
-  Future<void> _adjustImageRegion(WidgetSurfaceKind surface) async {
-    final path = surface == WidgetSurfaceKind.large
-        ? _widgetConfiguration.largeImagePath
-        : _widgetConfiguration.widget2ImagePath;
-    if (path.isEmpty) return;
-    setState(() => _busy = true);
-    try {
-      final bytes = await readManagedFile(
-        path,
-        maximumBytes: _maximumImageBytes,
-      );
-      if (!mounted) return;
-      final crop = await Navigator.of(context).push<WidgetImageCrop>(
-        MaterialPageRoute<WidgetImageCrop>(
-          builder: (_) => WidgetImageCropEditor(
-            bytes: bytes,
-            aspectRatio: surface == WidgetSurfaceKind.large ? 2.15 : .68,
-          ),
-        ),
-      );
-      if (crop == null || !mounted) return;
-      setState(() => _widgetConfiguration = surface == WidgetSurfaceKind.large
-          ? _widgetConfiguration.copyWith(largeImageCrop: crop)
-          : _widgetConfiguration.copyWith(widget2ImageCrop: crop));
-      _scheduleNativePreviews();
-    } on Object catch (error) {
-      if (mounted) setState(() => _error = 'Không đọc được ảnh widget: $error');
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _chooseWidgetTextColor(WidgetSurfaceKind surface) async {
-    final chosen = await showModalBottomSheet<Color>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _RgbColorPicker(
-        initial: _widgetConfiguration.textColorFor(surface) ??
-            appThemePalette.widgetText,
-      ),
-    );
-    if (chosen == null || !mounted) return;
-    setState(() {
-      _widgetConfiguration = _widgetConfiguration.withTextColor(surface, chosen);
-    });
-    _scheduleNativePreviews();
-  }
-
-  Future<void> _chooseBorderColor(WidgetSurfaceKind surface) async {
-    final border = _widgetConfiguration.borderFor(surface);
-    final selected = await showModalBottomSheet<Color>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _RgbColorPicker(initial: border.color),
-    );
-    if (selected == null || !mounted) return;
-    setState(() {
-      _widgetConfiguration = _widgetConfiguration.withBorder(
-        surface,
-        border.copyWith(color: selected),
-      );
-    });
-    _scheduleNativePreviews();
   }
 
   Future<void> _chooseColor(int index) async {
@@ -431,7 +237,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
       font: _font,
       createdAt: widget.existing?.createdAt ?? now,
       updatedAt: now,
-      widgets: _widgetConfiguration.copyWith(cornerRadius: _radius),
     );
   }
 
@@ -545,12 +350,7 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
               max: 28,
               divisions: 14,
               onChanged: (value) {
-                setState(() {
-                  _radius = value;
-                  _widgetConfiguration = _widgetConfiguration.copyWith(
-                    cornerRadius: value,
-                  );
-                });
+                setState(() => _radius = value);
                 _regenerate();
               },
             ),
@@ -583,7 +383,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
                   _font = choice;
                   _previewFontFamily = choice.family;
                 });
-                _scheduleNativePreviews();
               },
             ),
             const SizedBox(height: 8),
@@ -593,41 +392,9 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
               label: const Text('Nhập TTF / OTF từ máy'),
             ),
             const SizedBox(height: 20),
-            _SectionTitle('Xem trước widget'),
-            const SizedBox(height: 8),
-            if (_nativePreviews[_previewSurface] case final bytes?)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(_radius),
-                child: Image.memory(bytes, width: double.infinity,
-                    fit: BoxFit.contain, gaplessPlayback: true,
-                    filterQuality: FilterQuality.high),
-              )
-            else if (_tokens case final tokens?)
+            _SectionTitle('Preview — chưa áp dụng'),
+            if (_tokens case final tokens?)
               _ThemePreview(tokens: tokens, fontFamily: _previewFontFamily),
-            const SizedBox(height: 12),
-            SegmentedButton<WidgetSurfaceKind>(
-              segments: const <ButtonSegment<WidgetSurfaceKind>>[
-                ButtonSegment(
-                  value: WidgetSurfaceKind.small,
-                  label: Text('Nhỏ'),
-                ),
-                ButtonSegment(
-                  value: WidgetSurfaceKind.large,
-                  label: Text('Widget to'),
-                ),
-                ButtonSegment(
-                  value: WidgetSurfaceKind.widget2,
-                  label: Text('Widget 2'),
-                ),
-              ],
-              selected: <WidgetSurfaceKind>{_previewSurface},
-              onSelectionChanged: (value) {
-                setState(() => _previewSurface = value.first);
-                _scheduleNativePreviews();
-              },
-            ),
-            const SizedBox(height: 14),
-            _buildWidgetConfiguration(active),
             if (_error case final error?) ...<Widget>[
               const SizedBox(height: 12),
               Text(error, style: TextStyle(color: active.errorFallback)),
@@ -665,176 +432,6 @@ class _CustomThemeEditorState extends State<CustomThemeEditor> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildWidgetConfiguration(AppThemePalette active) {
-    final surface = _previewSurface;
-    final border = _widgetConfiguration.borderFor(surface);
-    final imagePath = switch (surface) {
-      WidgetSurfaceKind.small => '',
-      WidgetSurfaceKind.large => _widgetConfiguration.largeImagePath,
-      WidgetSurfaceKind.widget2 => _widgetConfiguration.widget2ImagePath,
-    };
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        _SectionTitle('Tùy chỉnh'),
-        if (surface != WidgetSurfaceKind.small)
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: _busy ? null : () => _pickWidgetImage(surface),
-                  icon: const Icon(Icons.add_photo_alternate_outlined),
-                  label: Text(imagePath.isEmpty ? 'Chọn ảnh' : 'Đổi ảnh'),
-                ),
-              ),
-              if (imagePath.isNotEmpty) ...<Widget>[
-                const SizedBox(width: 8),
-                IconButton.outlined(
-                  onPressed: () => _clearWidgetImage(surface),
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Xóa ảnh và dùng background theme',
-                ),
-              ],
-            ],
-          ),
-        if (imagePath.isNotEmpty) ...<Widget>[
-          const SizedBox(height: 5),
-          Text(
-            imagePath.split('/').last,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          if (surface != WidgetSurfaceKind.small)
-            TextButton.icon(
-              onPressed: _busy ? null : () => _adjustImageRegion(surface),
-              icon: const Icon(Icons.crop),
-              label: const Text('Chỉnh lại vùng ảnh'),
-            ),
-        ],
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Màu chữ widget'),
-          subtitle: Text(_widgetConfiguration.textColorFor(surface) == null
-              ? 'Theo màu theme'
-              : 'Màu chữ tùy chỉnh'),
-          leading: InkWell(
-            onTap: () => _chooseWidgetTextColor(surface),
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: _widgetConfiguration.textColorFor(surface) ?? active.widgetText,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: active.border, width: 2),
-              ),
-            ),
-          ),
-          onTap: () => _chooseWidgetTextColor(surface),
-          trailing: _widgetConfiguration.textColorFor(surface) == null
-              ? const Icon(Icons.color_lens_outlined)
-              : IconButton(
-                  icon: const Icon(Icons.settings_backup_restore),
-                  tooltip: 'Khôi phục màu chữ theme',
-                  onPressed: () {
-                    setState(() => _widgetConfiguration =
-                        _widgetConfiguration.withTextColor(surface, null));
-                    _scheduleNativePreviews();
-                  },
-                ),
-        ),
-        SwitchListTile.adaptive(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Viền trong'),
-          value: border.enabled,
-          onChanged: (value) {
-            setState(() {
-              _widgetConfiguration = _widgetConfiguration.withBorder(
-                surface,
-                border.copyWith(enabled: value),
-              );
-            });
-            _scheduleNativePreviews();
-          },
-        ),
-        if (border.enabled) ...<Widget>[
-          Row(
-            children: <Widget>[
-              InkWell(
-                onTap: () => _chooseBorderColor(surface),
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: border.color,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: active.border, width: 2),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Slider(
-                  value: border.width,
-                  min: .5,
-                  max: 16,
-                  onChanged: (value) {
-                    setState(() {
-                      _widgetConfiguration = _widgetConfiguration.withBorder(
-                        surface,
-                        border.copyWith(width: value),
-                      );
-                    });
-                    _scheduleNativePreviews();
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 44,
-                child: Text('${border.width.toStringAsFixed(1)}dp'),
-              ),
-            ],
-          ),
-          SwitchListTile.adaptive(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Kiểu viền Tiên Môn'),
-            value: border.tienMonStyle,
-            onChanged: (value) {
-              setState(() {
-                _widgetConfiguration = _widgetConfiguration.withBorder(
-                  surface,
-                  border.copyWith(tienMonStyle: value),
-                );
-              });
-              _scheduleNativePreviews();
-            },
-          ),
-        ],
-        if (surface == WidgetSurfaceKind.widget2) ...<Widget>[
-          Text(
-            'Độ trong Liquid Glass: '
-            '${(_widgetConfiguration.glassOpacity * 100).round()}%',
-          ),
-          Slider(
-            value: _widgetConfiguration.glassOpacity,
-            min: .18,
-            max: .92,
-            onChanged: (value) {
-              setState(() {
-                _widgetConfiguration = _widgetConfiguration.copyWith(
-                  glassOpacity: value,
-                );
-              });
-              _scheduleNativePreviews();
-            },
-          ),
-        ],
-      ],
     );
   }
 
@@ -1148,7 +745,10 @@ class _RgbColorPickerState extends State<_RgbColorPicker> {
               const SizedBox(height: 5),
               Text(
                 'Kéo hoặc chạm trực tiếp trên bảng màu, hoặc chỉnh RGB.',
-                style: TextStyle(color: palette.textSecondary, fontSize: 12.5),
+                style: TextStyle(
+                  color: palette.textSecondary,
+                  fontSize: 12.5,
+                ),
               ),
               const SizedBox(height: 14),
               SizedBox(
@@ -1213,8 +813,7 @@ class _RgbColorPickerState extends State<_RgbColorPicker> {
                 child: Text(
                   _colorHex(rgb),
                   style: TextStyle(
-                    color:
-                        ThemeData.estimateBrightnessForColor(rgb) ==
+                    color: ThemeData.estimateBrightnessForColor(rgb) ==
                             Brightness.dark
                         ? Colors.white
                         : Colors.black,
@@ -1267,8 +866,9 @@ class _RgbSpectrumPainter extends CustomPainter {
     canvas.drawRect(
       rect,
       Paint()
-        ..shader = LinearGradient(colors: <Color>[Colors.white, hue])
-            .createShader(rect),
+        ..shader = LinearGradient(
+          colors: <Color>[Colors.white, hue],
+        ).createShader(rect),
     );
     canvas.drawRect(
       rect,
@@ -1358,7 +958,11 @@ class _HueBar extends StatelessWidget {
             thumbColor: Colors.white,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
           ),
-          child: Slider(value: hue, max: 360, onChanged: onChanged),
+          child: Slider(
+            value: hue,
+            max: 360,
+            onChanged: onChanged,
+          ),
         ),
       ],
     ),

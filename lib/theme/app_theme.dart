@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:better_phenikaa_schedule/features/giao_dien/bo_may/theme_tokens.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/du_lieu/custom_theme.dart';
-import 'package:better_phenikaa_schedule/features/giao_dien/du_lieu/widget_theme_configuration.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/du_lieu/custom_theme_repository.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/phong_chu/font_choice.dart';
 import 'package:better_phenikaa_schedule/features/giao_dien/phong_chu/font_manager.dart';
@@ -479,8 +478,6 @@ class AppThemeController extends ChangeNotifier {
   static const _legacyPreferenceKey = 'better_phenikaa_theme_v2';
   static const _appliedCustomThemeKey =
       'better_phenikaa_applied_custom_theme_v1';
-  static const _widgetConfigurationKey =
-      'better_phenikaa_widget_configuration_v14';
   static const _widgetPreferenceKey = 'appTheme';
   static const _tienMonTextPrimaryKey = 'tien_mon_text_primary_v1';
   static const _tienMonTextSecondaryKey = 'tien_mon_text_secondary_v1';
@@ -499,8 +496,6 @@ class AppThemeController extends ChangeNotifier {
   CustomThemeDefinition? _activeCustomTheme;
   String? _activeCustomFontFamily;
   List<CustomThemeDefinition> _customThemes = <CustomThemeDefinition>[];
-  WidgetThemeConfiguration _widgetConfiguration =
-      const WidgetThemeConfiguration();
   AppThemePalette? _transitionPalette;
   Timer? _transitionTimer;
   Completer<void>? _transitionCompletion;
@@ -521,10 +516,6 @@ class AppThemeController extends ChangeNotifier {
   List<CustomThemeDefinition> get customThemes =>
       List<CustomThemeDefinition>.unmodifiable(_customThemes);
   CustomThemeDefinition? get activeCustomTheme => _activeCustomTheme;
-  // Presets always expose their own immutable widget configuration.
-  WidgetThemeConfiguration get widgetConfiguration => _theme == AppThemeId.custom
-      ? _widgetConfiguration
-      : const WidgetThemeConfiguration();
   bool get isTransitioning => _transitionPalette != null;
 
   void resetAfterLogout() {
@@ -539,7 +530,6 @@ class AppThemeController extends ChangeNotifier {
     _activeCustomTheme = null;
     _activeCustomFontFamily = null;
     _customThemes = <CustomThemeDefinition>[];
-    _widgetConfiguration = const WidgetThemeConfiguration();
     notifyListeners();
   }
 
@@ -567,19 +557,6 @@ class AppThemeController extends ChangeNotifier {
     if (_loaded) return;
     _loaded = true;
     final prefs = await SharedPreferences.getInstance();
-    final widgetConfigurationRaw = prefs.getString(_widgetConfigurationKey);
-    if (widgetConfigurationRaw != null) {
-      try {
-        final decoded = jsonDecode(widgetConfigurationRaw);
-        if (decoded is Map<String, dynamic>) {
-          _widgetConfiguration = WidgetThemeConfiguration.fromJson(
-            Map<String, Object?>.from(decoded),
-          );
-        }
-      } on Object {
-        _widgetConfiguration = const WidgetThemeConfiguration();
-      }
-    }
     _tienMonTextPrimary = Color(
       prefs.getInt(_tienMonTextPrimaryKey) ?? 0xFFFFD66B,
     );
@@ -637,9 +614,6 @@ class AppThemeController extends ChangeNotifier {
           restored.font,
         );
         _theme = AppThemeId.custom;
-        _widgetConfiguration = restored.hasWidgetConfiguration
-            ? restored.widgets
-            : const WidgetThemeConfiguration();
       }
     } else if (saved != null) {
       for (final candidate in AppThemeId.values) {
@@ -705,33 +679,11 @@ class AppThemeController extends ChangeNotifier {
     final fontFamily = await ThemeFontManager.instance.resolveFamily(
       theme.font,
     );
-    // Each custom theme owns its widget settings. Never inherit another
-    // custom theme's photo or a preset's previous state.
-    _widgetConfiguration = theme.hasWidgetConfiguration
-        ? theme.widgets
-        : const WidgetThemeConfiguration();
     await _transitionTo(
       themeId: AppThemeId.custom,
       customTheme: theme,
       resolvedFontFamily: fontFamily,
     );
-  }
-
-  Future<void> setWidgetConfiguration(
-    WidgetThemeConfiguration configuration,
-  ) async {
-    if (_theme != AppThemeId.custom) {
-      throw StateError('Preset theme không hỗ trợ tùy chỉnh widget.');
-    }
-    _widgetConfiguration = configuration;
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(
-      _widgetConfigurationKey,
-      jsonEncode(configuration.toJson()),
-    );
-    final nativeApplied = await _applyWidgetTheme(_widgetThemeKey, palette);
-    if (!nativeApplied) await _syncWidgetTheme();
-    notifyListeners();
   }
 
   Future<void> saveCustomTheme(CustomThemeDefinition theme) async {
@@ -865,13 +817,6 @@ class AppThemeController extends ChangeNotifier {
 
   Future<void> _commitSelection(AppThemePalette target) async {
     final preferences = await SharedPreferences.getInstance();
-    // Do not persist custom widget settings while choosing a fixed preset.
-    if (_theme == AppThemeId.custom) {
-      await preferences.setString(
-        _widgetConfigurationKey,
-        jsonEncode(_widgetConfiguration.toJson()),
-      );
-    }
     final selectionKey =
         _theme == AppThemeId.custom && _activeCustomTheme != null
         ? 'custom:${_activeCustomTheme!.id}'
@@ -926,10 +871,6 @@ class AppThemeController extends ChangeNotifier {
               : _theme == AppThemeId.tienMonPremium
               ? _tienMonFont.path ?? ''
               : '',
-          'widgetConfig': jsonEncode((themeKey == 'custom'
-                  ? _widgetConfiguration
-                  : const WidgetThemeConfiguration())
-              .toJson()),
         },
       );
       return true;
@@ -946,16 +887,6 @@ class AppThemeController extends ChangeNotifier {
       name: 'ScheduleWidgetProvider',
       qualifiedAndroidName:
           'vn.edu.phenikaa.better_phenikaa_schedule.ScheduleWidgetProvider',
-    );
-    await HomeWidget.updateWidget(
-      name: 'OverviewWidgetProvider',
-      qualifiedAndroidName:
-          'vn.edu.phenikaa.better_phenikaa_schedule.OverviewWidgetProvider',
-    );
-    await HomeWidget.updateWidget(
-      name: 'Widget2Provider',
-      qualifiedAndroidName:
-          'vn.edu.phenikaa.better_phenikaa_schedule.Widget2Provider',
     );
   }
 }
