@@ -32,6 +32,9 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class ScheduleWidgetProvider : HomeWidgetProvider() {
+    internal fun renderFromDispatcher(context: Context, manager: AppWidgetManager, widgetId: Int) =
+        renderWidget(context, manager, widgetId)
+
     internal fun isBetterDefault(context: Context): Boolean = readThemeColors(context).key == "classic"
 
     internal fun restoreDisplay(context: Context, manager: AppWidgetManager, ids: IntArray) {
