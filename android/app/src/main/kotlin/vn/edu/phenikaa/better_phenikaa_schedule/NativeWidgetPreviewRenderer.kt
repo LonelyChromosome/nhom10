@@ -61,9 +61,6 @@ internal object NativeWidgetPreviewRenderer {
                 item,
                 widthDp,
                 heightDp,
-                paletteOverride = palette,
-                typefaceOverride = previewTypeface,
-                cornerRadiusDpOverride = config.cornerRadiusDp,
             )
             Canvas(result).drawBitmap(cover, 0f, 0f, null)
             cover.recycle()
@@ -138,7 +135,7 @@ internal object NativeWidgetPreviewRenderer {
             val left = contentLeft + index * (cardWidth + gap)
             val rect = RectF(left, cardTop, left + cardWidth, cardBottom)
             val card = ScheduleWidgetProvider().overviewCardBackground(
-                context, index, index == 0, palette,
+                context, index, index == 0,
             )
             canvas.drawBitmap(card, null, rect, Paint(Paint.FILTER_BITMAP_FLAG))
             card.recycle()
