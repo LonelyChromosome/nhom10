@@ -6,6 +6,15 @@ import android.content.Context
 
 /** Resets every widget to the device's current local day and refreshes its data. */
 internal object WidgetRefreshCoordinator {
+    fun refreshWidget2TimeTheme(context: Context) {
+        val manager = AppWidgetManager.getInstance(context)
+        manager.getAppWidgetIds(ComponentName(context, Widget2Provider::class.java))
+            .forEach { id ->
+                WidgetRenderDispatcher.render(context, manager,
+                    WidgetRenderRequest(WidgetSurface.WIDGET2, id, fadeContent = true))
+            }
+    }
+
     fun manualRefresh(context: Context) {
         val appContext = context.applicationContext
         val manager = AppWidgetManager.getInstance(appContext)
