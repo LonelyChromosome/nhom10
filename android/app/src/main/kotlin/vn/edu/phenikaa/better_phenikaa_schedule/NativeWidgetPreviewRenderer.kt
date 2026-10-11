@@ -145,7 +145,7 @@ internal object NativeWidgetPreviewRenderer {
                 textSize = (if (geometry.compact) 13f else 17f) *
                     context.resources.displayMetrics.scaledDensity
                 color = ScheduleWidgetProvider().overviewTimeColor(
-                    context, index, index == 0, palette,
+                    context, index, index == 0,
                 )
             }
             canvas.drawText(item.startAt.drop(11).take(5), textLeft,
