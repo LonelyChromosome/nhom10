@@ -34,7 +34,17 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
       - name: Build APK
-        run: flutter build apk --release
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee apk-build.log
+      - name: Upload build diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-build-diagnostics
+          path: apk-build.log
+          if-no-files-found: ignore
       - name: Package APK
         shell: bash
         run: |
