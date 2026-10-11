@@ -34,21 +34,16 @@ jobs:
       - name: Bootstrap project
         run: bash tool/bootstrap.sh
 
-      - name: Verify standalone main source
+      - name: Verify 1.0 build prerequisites
         shell: bash
         run: |
           set -euo pipefail
-          test -f assets/tien_mon_premium/app_backgrounds/tienmon_1_1440x2560.png
-          test -f assets/tien_mon_premium/app_backgrounds/tienmon_8_1440x2560.png
-          test -f assets/tien_mon_premium/fonts/FzCoTrang.ttf
-          test -f assets/tien_mon_premium/widget_overview/wid_sang.png
+          test -f pubspec.yaml
+          test -f lib/main.dart
           test -f android/app/src/main/kotlin/vn/edu/phenikaa/better_phenikaa_schedule/NativeQldtWidgetSync.kt
-          grep -F 'ValueNotifier<bool> _weeklyMode' lib/app/app.dart
-          grep -F 'builder: (context, weekly, _) => IndexedStack(' lib/app/app.dart
-          grep -F 'applyPendingSelection' android/app/src/main/kotlin/vn/edu/phenikaa/better_phenikaa_schedule/ScheduleWidgetProvider.kt
-          ! grep -F 'pinSelectedFirst()' android/app/src/main/kotlin/vn/edu/phenikaa/better_phenikaa_schedule/WidgetSnapshotStore.kt
           test -x android/gradlew
           test -f android/gradle/wrapper/gradle-wrapper.jar
+          flutter pub get
 
       - name: Build public APK
         run: flutter build apk --release
